@@ -19,11 +19,11 @@ st.markdown("<h1 style='text-align: center;'>ICARUS PV/T ROI Calculator</h1>", u
 # Sidebar Inputs
 st.sidebar.header("System Configuration")
 location_options = {
-    "Los Angeles, CA": 1750,
-    "New York, NY": 1500,
-    "Chicago, IL": 1400,
-    "Houston, TX": 1600,
-    "Phoenix, AZ": 1800,
+    "Los Angeles, CA": 750,
+    "New York, NY": 650,
+    "Chicago, IL": 640,
+    "Houston, TX": 600,
+    "Phoenix, AZ": 800,
     "Custom": None
 }
 location = st.sidebar.selectbox("Select Location", list(location_options.keys()))
