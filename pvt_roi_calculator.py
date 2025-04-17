@@ -167,4 +167,14 @@ if st.sidebar.button("Calculate ROI"):
 # Persistent Help Sections
 st.sidebar.header("🧭 Help")
 with st.sidebar.expander("❓ FAQ"):
-    st.marked
+    st.markdown("""
+### 📘 How It Works
+
+**Key Formulas Used:**
+- **PV Output (kWh)** = System Size * Irradiance * (1 + PV Boost %)
+- **Thermal Output (kWh)** = PV Output * Thermal Efficiency
+- **Hot Water (gallons)** = Thermal Output * 3412 / (8.34 * ΔT)
+- **CO₂ Savings (kg)** = PV Output * Grid Emission Factor + (if enabled) Thermal MMBTU * Gas Emission Factor
+- **Gas Savings (MMBTU)** = Thermal Output * Offset % / 3412 * $/MMBTU
+- **Payback (years)** = Net Cost / Total Annual Savings
+""")
