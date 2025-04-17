@@ -48,18 +48,15 @@ if include_gas_savings:
 
 # Main calculation and output
 if st.sidebar.button("Calculate ROI"):
-    # Energy calculations
     annual_irradiance_kwh_m2 = user_irradiance
     pv_output_kwh = system_size_kw * annual_irradiance_kwh_m2 * (1 + pv_boost_pct / 100)
     thermal_output_kwh = pv_output_kwh * (thermal_efficiency / 100)
 
-    # Hot water calculation
     if water_temp_out > water_temp_in:
         hot_water_gallons = (thermal_output_kwh * 3412) / (8.34 * (water_temp_out - water_temp_in))
     else:
         hot_water_gallons = 0
 
-    # Financials
     installation_cost = system_size_kw * 1000 * system_cost_per_w
     net_system_cost = installation_cost * (1 - incentive_pct / 100)
 
@@ -72,14 +69,12 @@ if st.sidebar.button("Calculate ROI"):
     total_annual_savings = electricity_savings + gas_savings
     payback_period = net_system_cost / total_annual_savings if total_annual_savings else float("inf")
 
-    # CO2 savings
     co2_savings_kg = pv_output_kwh * grid_emission_factor
     if include_gas_savings:
         gas_emission_factor = 53  # kg CO2 per MMBTU
         co2_savings_kg += mmbtu_saved * gas_emission_factor
     co2_savings_ton = co2_savings_kg / 1000
 
-    # Display summary
     st.subheader("Summary")
     st.write(f"**Annual PV Output:** {pv_output_kwh:,.0f} kWh")
     st.write(f"**Annual Thermal Output:** {thermal_output_kwh:,.0f} kWh")
@@ -91,21 +86,17 @@ if st.sidebar.button("Calculate ROI"):
     st.write(f"**Payback Period:** {payback_period:.1f} years")
     st.write(f"**CO₂ Savings:** {co2_savings_kg:,.0f} kg / {co2_savings_ton:.2f} tons")
 
-    # Updated Charts
     st.markdown("### Energy, Water & Carbon Breakdown")
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
-    # Subplot 1: Energy Output
     axes[0].bar(['PV (kWh)', 'Thermal (kWh)'], [pv_output_kwh, thermal_output_kwh], color=["#1f77b4", "#ff7f0e"])
     axes[0].set_title("Energy Output")
     axes[0].set_ylabel("kWh")
 
-    # Subplot 2: Hot Water
     axes[1].bar(['Hot Water'], [hot_water_gallons], color="#2ca02c")
     axes[1].set_title("Hot Water")
     axes[1].set_ylabel("Gallons")
 
-    # Subplot 3: CO2
     axes[2].bar(['CO₂ Saved'], [co2_savings_ton], color="#d62728")
     axes[2].set_title("CO₂ Savings")
     axes[2].set_ylabel("Metric Tons")
@@ -139,7 +130,6 @@ if st.sidebar.button("Calculate ROI"):
     ax3.grid(True)
     st.pyplot(fig3)
 
-    # PDF Export
     st.markdown("### 📄 Download PDF Report")
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
         pdf = PDF()
@@ -206,3 +196,4 @@ with st.expander("📘 How It Works"):
 - **Gas Savings** = (Thermal Output * Offset %) / 3412 * Gas Rate ($/MMBTU)
 - **Payback Period** = Net System Cost / Total Annual Savings
 """)
+
