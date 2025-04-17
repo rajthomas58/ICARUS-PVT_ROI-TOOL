@@ -166,7 +166,7 @@ if st.sidebar.button("Calculate ROI"):
 
 # Persistent Help Sections
 st.sidebar.header("🧭 Help")
-with with st.sidebar.expander("❓ FAQ"):
+with st.sidebar.expander("❓ FAQ"):
     st.markdown("""
 **What is a PV/T system?**  
 A hybrid solar system that produces both electricity and heat.
@@ -205,4 +205,3 @@ with st.expander("📘 How It Works"):
 - **Gas Savings** = (Thermal Output * Offset %) / 3412 * Gas Rate ($/MMBTU)
 - **Payback Period** = Net System Cost / Total Annual Savings
 """)
-
