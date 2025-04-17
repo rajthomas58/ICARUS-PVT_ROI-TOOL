@@ -87,7 +87,7 @@ if st.sidebar.button("Calculate ROI"):
     st.subheader("Summary")
     st.write(f"**Annual PV Output:** {pv_output_kwh:,.0f} kWh")
     st.write(f"**Annual Thermal Output:** {thermal_output_kwh:,.0f} kWh")
-    st.write(f"**Hot Water Produced:** {hot_water_gallons:,.0f} gallons")
+    st.write(f"**Hot Water Produced:** {hot_water_gallons / 1000:,.1f} thousand gallons")
     st.write(f"**Electricity Savings:** ${electricity_savings:,.2f}")
     if include_gas_savings:
         st.write(f"**Natural Gas Savings:** ${gas_savings:,.2f}")
@@ -100,8 +100,8 @@ if st.sidebar.button("Calculate ROI"):
     with col1:
         st.markdown("### Energy, Water & Carbon Breakdown")
         df1 = pd.DataFrame({
-            'Category': ['PV Energy (kWh)', 'Thermal Energy (kWh)', 'Hot Water (gal)', 'CO₂ Savings (kg)'],
-            'Value': [pv_output_kwh, thermal_output_kwh, hot_water_gallons, co2_savings_kg]
+            'Category': ['PV Energy (kWh)', 'Thermal Energy (kWh)', 'Hot Water (1,000 gal)', 'CO₂ Savings (kg)'],
+            'Value': [pv_output_kwh, thermal_output_kwh, hot_water_gallons / 1000, co2_savings_kg]
         })
         fig1, ax1 = plt.subplots(figsize=(8, 6))
         ax1.bar(df1['Category'], df1['Value'], color=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"])
@@ -150,7 +150,7 @@ if st.sidebar.button("Calculate ROI"):
         pdf.cell(200, 10, f"System Size: {system_size_kw} kW", ln=True)
         pdf.cell(200, 10, f"Annual PV Output: {pv_output_kwh:,.0f} kWh", ln=True)
         pdf.cell(200, 10, f"Annual Thermal Output: {thermal_output_kwh:,.0f} kWh", ln=True)
-        pdf.cell(200, 10, f"Hot Water: {hot_water_gallons:,.0f} gallons", ln=True)
+        pdf.cell(200, 10, f"Hot Water: {hot_water_gallons / 1000:,.1f} thousand gallons", ln=True)
         pdf.cell(200, 10, f"Electricity Savings: ${electricity_savings:,.2f}", ln=True)
         if include_gas_savings:
             pdf.cell(200, 10, f"Natural Gas Savings: ${gas_savings:,.2f}", ln=True)
