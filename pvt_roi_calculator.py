@@ -48,6 +48,16 @@ if include_gas_savings:
     thermal_offset_pct = st.sidebar.slider("Thermal Load Offset by PV/T (%)", 0, 100, 70)
 
 if st.sidebar.button("Calculate ROI"):
+    st.subheader("Summary")
+    st.write(f"**Annual PV Output:** {pv_output_kwh:,.0f} kWh")
+    st.write(f"**Annual Thermal Output:** {thermal_output_kwh:,.0f} kWh")
+    st.write(f"**Hot Water Produced:** {hot_water_gallons:,.0f} gallons")
+    st.write(f"**Electricity Savings:** ${electricity_savings:,.2f}")
+    if include_gas_savings:
+        st.write(f"**Natural Gas Savings:** ${gas_savings:,.2f}")
+    st.write(f"**Total Annual Savings:** ${total_annual_savings:,.2f}")
+    st.write(f"**Payback Period:** {payback_period:.1f} years")
+    st.write(f"**CO₂ Savings:** {co2_savings_kg:,.0f} kg")
     st.header("Calculation Results")
     annual_irradiance_kwh_m2 = user_irradiance
     pv_output_kwh = system_size_kw * annual_irradiance_kwh_m2 * (1 + pv_boost_pct / 100)
@@ -61,7 +71,12 @@ if st.sidebar.button("Calculate ROI"):
     gas_savings = ((thermal_output_kwh * (thermal_offset_pct / 100)) / 3412 * gas_rate) if include_gas_savings else 0
     total_annual_savings = electricity_savings + gas_savings
     payback_period = net_system_cost / total_annual_savings if total_annual_savings else float("inf")
-    co2_savings_kg = (pv_output_kwh + thermal_output_kwh) * grid_emission_factor
+    co2_savings_kg = pv_output_kwh * grid_emission_factor
+    # Optional: add thermal gas offset if enabled
+    if include_gas_savings:
+        gas_emission_factor = 53  # kg CO2 per MMBTU
+        mmbtu_saved = (thermal_output_kwh * (thermal_offset_pct / 100)) / 3412
+        co2_savings_kg += mmbtu_saved * gas_emission_factor
     co2_savings_ton = co2_savings_kg / 1000
 
     chart1, chart2 = st.columns(2)
@@ -69,7 +84,7 @@ if st.sidebar.button("Calculate ROI"):
         st.markdown("### Chart 1: Energy, Water & Carbon")
         df1 = pd.DataFrame({
             'Category': ['PV Energy (kWh)', 'Thermal Energy (kWh)', 'Hot Water (thousands gal)', 'CO₂ Savings (tons)'],
-            'Value': [pv_output_kwh, thermal_output_kwh, hot_water_gallons / 1000, co2_savings_ton]
+            'Value': [pv_output_kwh, thermal_output_kwh, hot_water_gallons / 1000, co2_savings_kg]
         })
         fig1, ax1 = plt.subplots(figsize=(8, 6))
         ax1.bar(df1['Category'], df1['Value'], color=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"])
@@ -163,6 +178,25 @@ with st.expander("📘 How It Works"):
     st.markdown("""
 ### Key Formulas Used:
 - **PV Output (kWh)** = System Size × Irradiance × (1 + PV Boost %)
+- **Thermal Output** = PV Output × Thermal Efficiency
+- **Hot Water (gallons)** = Thermal × 3412 ÷ (8.34 × ΔT)
+- **CO₂ Savings** = PV Output × Grid Emission Factor + (if thermal offset enabled) Thermal MMBTU × Gas Emission Factor
+- **Gas Savings** = Thermal × Offset % ÷ 3412 × $/MMBTU
+- **Payback** = Net Cost ÷ Annual Savings
+""")
+
+
+with st.sidebar.expander("📘 Glossary"):
+    st.markdown("""
+**System Size (kW):** Capacity of PV component.  
+**Irradiance:** Solar energy received annually.  
+**PV Boost:** Additional PV gain from Icarus design.  
+**Thermal Efficiency:** % of solar energy converted to heat.  
+**Water In/Out Temp:** For estimating hot water generation.  
+**Grid CO₂ Factor:** kg CO₂ per kWh from the grid.  
+**MMBTU:** 1 million BTUs, for natural gas pricing.
+""")
+
 - **Thermal Output** = PV Output × Thermal Efficiency
 - **Hot Water (gallons)** = Thermal × 3412 ÷ (8.34 × ΔT)
 - **CO₂ Savings** = (PV + Thermal Output) × Emission Factor
