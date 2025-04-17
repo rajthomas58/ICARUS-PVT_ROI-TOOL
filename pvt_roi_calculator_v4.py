@@ -1,3 +1,6 @@
+
+# The full code is reconstructed including all logic up to charts and PDF export
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -53,8 +56,7 @@ if st.sidebar.button("Calculate ROI"):
     pv_output_kwh = system_size_kw * annual_irradiance_kwh_m2
     pv_output_kwh *= (1 + pv_boost_pct / 100)
     thermal_output_kwh = pv_output_kwh * (thermal_efficiency / 100)
-    
-    # Hot water gallons calculation
+
     if water_temp_out > water_temp_in:
         hot_water_gallons = (thermal_output_kwh * 3412) / (8.34 * (water_temp_out - water_temp_in))
     else:
@@ -73,6 +75,9 @@ if st.sidebar.button("Calculate ROI"):
     payback_period = net_system_cost / total_annual_savings if total_annual_savings else float("inf")
     co2_savings_kg = (pv_output_kwh + thermal_output_kwh) * grid_emission_factor
     co2_savings_ton = co2_savings_kg / 1000
+
+    st.write(f"[Debug] CO2 savings (kg): {co2_savings_kg:,.2f}")
+    st.write(f"[Debug] CO2 savings (tons): {co2_savings_ton:,.2f}")
 
     st.subheader("Summary")
     st.write(f"**Annual PV Output:** {pv_output_kwh:,.0f} kWh")
