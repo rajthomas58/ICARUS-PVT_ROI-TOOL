@@ -28,9 +28,9 @@ location_options = {
 location = st.sidebar.selectbox("Select Location", list(location_options.keys()))
 annual_irradiance_default = location_options.get(location) or 1700.0
 user_irradiance = st.sidebar.number_input("Annual Solar Irradiance (kWh/m²/year)", value=annual_irradiance_default, key="irradiance_input")
-system_size_kw = st.sidebar.number_input("System Size (kW)", value=5.0)
-pv_boost_pct = st.sidebar.number_input("PV Boost (%)", value=0.0)
-thermal_efficiency = st.sidebar.number_input("Thermal Efficiency (%)", value=50.0)
+system_size_kw = st.sidebar.number_input("System Size (kW)", value=100.0)
+pv_boost_pct = st.sidebar.number_input("PV Boost (%)", value=10.0)
+thermal_efficiency = st.sidebar.number_input("Thermal Efficiency (%)", value=100.0)
 system_cost_per_w = st.sidebar.number_input("System Cost ($/W)", value=2.5)
 incentive_pct = st.sidebar.slider("Incentive / Tax Credit (%)", 0, 100, 30)
 
@@ -83,7 +83,7 @@ if st.sidebar.button("Calculate ROI"):
     st.subheader("Summary")
     st.write(f"**Annual PV Output:** {pv_output_kwh:,.0f} kWh")
     st.write(f"**Annual Thermal Output:** {thermal_output_kwh:,.0f} kWh")
-    st.write(f"**Hot Water Produced:** {hot_water_gallons / 1000:,.1f} thousand gallons")
+    st.write(f"**Hot Water Produced:** {hot_water_gallons:,.0f} gallons")
     st.write(f"**Electricity Savings:** ${electricity_savings:,.2f}")
     if include_gas_savings:
         st.write(f"**Natural Gas Savings:** ${gas_savings:,.2f}")
@@ -101,9 +101,9 @@ if st.sidebar.button("Calculate ROI"):
     axes[0].set_ylabel("kWh")
 
     # Subplot 2: Hot Water
-    axes[1].bar(['Hot Water'], [hot_water_gallons / 1000], color="#2ca02c")
+    axes[1].bar(['Hot Water'], [hot_water_gallons], color="#2ca02c")
     axes[1].set_title("Hot Water")
-    axes[1].set_ylabel("1,000 gallons")
+    axes[1].set_ylabel("Gallons")
 
     # Subplot 3: CO2
     axes[2].bar(['CO₂ Saved'], [co2_savings_ton], color="#d62728")
@@ -152,7 +152,7 @@ if st.sidebar.button("Calculate ROI"):
         pdf.cell(200, 10, f"System Size: {system_size_kw} kW", ln=True)
         pdf.cell(200, 10, f"Annual PV Output: {pv_output_kwh:,.0f} kWh", ln=True)
         pdf.cell(200, 10, f"Annual Thermal Output: {thermal_output_kwh:,.0f} kWh", ln=True)
-        pdf.cell(200, 10, f"Hot Water: {hot_water_gallons / 1000:,.1f} thousand gallons", ln=True)
+        pdf.cell(200, 10, f"Hot Water: {hot_water_gallons:,.0f} gallons", ln=True)
         pdf.cell(200, 10, f"Electricity Savings: ${electricity_savings:,.2f}", ln=True)
         if include_gas_savings:
             pdf.cell(200, 10, f"Natural Gas Savings: ${gas_savings:,.2f}", ln=True)
@@ -185,8 +185,8 @@ with st.sidebar.expander("📘 Glossary"):
 **Irradiance (kWh/m²/year):** Annual solar radiation received per square meter.  
 **PV Boost (%):** Additional electrical output from hybrid technology.  
 **Thermal Efficiency (%):** Portion of solar energy converted to heat.  
-**System Cost ($/W):** Installation cost per watt.  
-**Incentive (%):** Percent of cost offset by rebate or tax credit.  
+**System Cost ($/W):** Total cost of the system to the customer.  
+**Incentive (%):** Federal/State incentives available.  
 **Electricity Rate ($/kWh):** Price paid for grid electricity.  
 **Grid CO₂ Factor (kg/kWh):** CO₂ emissions per kWh from the grid.  
 **Gas Rate ($/MMBTU):** Cost of natural gas.  
