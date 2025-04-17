@@ -27,11 +27,7 @@ location_options = {
 }
 location = st.sidebar.selectbox("Select Location", list(location_options.keys()))
 annual_irradiance_default = location_options.get(location) or 1700.0
-user_irradiance = st.sidebar.number_input(
-    "Annual Solar Irradiance (kWh/m²/year)",
-    value=annual_irradiance_default,
-    key="irradiance_input"
-)
+user_irradiance = st.sidebar.number_input("Annual Solar Irradiance (kWh/m²/year)", value=annual_irradiance_default, key="irradiance_input")
 system_size_kw = st.sidebar.number_input("System Size (kW)", value=5.0)
 pv_boost_pct = st.sidebar.number_input("PV Boost (%)", value=0.0)
 thermal_efficiency = st.sidebar.number_input("Thermal Efficiency (%)", value=50.0)
@@ -95,32 +91,38 @@ if st.sidebar.button("Calculate ROI"):
     st.write(f"**Payback Period:** {payback_period:.1f} years")
     st.write(f"**CO₂ Savings:** {co2_savings_kg:,.0f} kg / {co2_savings_ton:.2f} tons")
 
-    # Charts
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("### Energy, Water & Carbon Breakdown")
-        df1 = pd.DataFrame({
-            'Category': ['PV Energy (kWh)', 'Thermal Energy (kWh)', 'Hot Water (1,000 gal)', 'CO₂ Savings (kg)'],
-            'Value': [pv_output_kwh, thermal_output_kwh, hot_water_gallons / 1000, co2_savings_kg]
-        })
-        fig1, ax1 = plt.subplots(figsize=(8, 6))
-        ax1.bar(df1['Category'], df1['Value'], color=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"])
-        ax1.set_ylabel("Amount")
-        ax1.set_title("Energy, Water & Carbon Breakdown")
-        ax1.tick_params(axis='x', rotation=15)
-        st.pyplot(fig1)
-    with col2:
-        st.markdown("### Annual Savings Breakdown")
-        df2 = pd.DataFrame({
-            'Type': ['Electricity Savings ($)', 'Gas Savings ($)'],
-            'Value': [electricity_savings, gas_savings]
-        })
-        fig2, ax2 = plt.subplots(figsize=(8, 6))
-        ax2.bar(df2['Type'], df2['Value'], color=["#4daf4a", "#984ea3"])
-        ax2.set_ylabel("Savings ($)")
-        ax2.set_title("Annual Savings Breakdown")
-        ax2.tick_params(axis='x', rotation=15)
-        st.pyplot(fig2)
+    # Updated Charts
+    st.markdown("### Energy, Water & Carbon Breakdown")
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    # Subplot 1: Energy Output
+    axes[0].bar(['PV (kWh)', 'Thermal (kWh)'], [pv_output_kwh, thermal_output_kwh], color=["#1f77b4", "#ff7f0e"])
+    axes[0].set_title("Energy Output")
+    axes[0].set_ylabel("kWh")
+
+    # Subplot 2: Hot Water
+    axes[1].bar(['Hot Water'], [hot_water_gallons / 1000], color="#2ca02c")
+    axes[1].set_title("Hot Water")
+    axes[1].set_ylabel("1,000 gallons")
+
+    # Subplot 3: CO2
+    axes[2].bar(['CO₂ Saved'], [co2_savings_ton], color="#d62728")
+    axes[2].set_title("CO₂ Savings")
+    axes[2].set_ylabel("Metric Tons")
+
+    st.pyplot(fig)
+
+    st.markdown("### Annual Savings Breakdown")
+    df2 = pd.DataFrame({
+        'Type': ['Electricity Savings ($)', 'Gas Savings ($)'],
+        'Value': [electricity_savings, gas_savings]
+    })
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    ax2.bar(df2['Type'], df2['Value'], color=["#4daf4a", "#984ea3"])
+    ax2.set_ylabel("Savings ($)")
+    ax2.set_title("Annual Savings Breakdown")
+    ax2.tick_params(axis='x', rotation=15)
+    st.pyplot(fig2)
 
     st.markdown("### Cumulative Cash Flow Over 25 Years")
     years = np.arange(1, 26)
@@ -158,13 +160,12 @@ if st.sidebar.button("Calculate ROI"):
         pdf.cell(200, 10, f"Payback Period: {payback_period:.1f} years", ln=True)
         pdf.cell(200, 10, f"CO₂ Savings: {co2_savings_ton:.2f} metric tons", ln=True)
 
-        for fig in [fig1, fig2, fig3]:
+        for fig in [fig2, fig3]:
             with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as img_temp:
                 fig.savefig(img_temp.name, bbox_inches='tight')
                 pdf.add_page()
                 pdf.image(img_temp.name, x=10, w=190)
 
-# Persistent Help Sections
 st.sidebar.header("🧭 Help")
 with st.sidebar.expander("❓ FAQ"):
     st.markdown("""
