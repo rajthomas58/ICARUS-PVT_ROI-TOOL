@@ -203,3 +203,4 @@ with st.sidebar.expander("📘 Glossary"):
 - **Gas Savings** = Thermal × Offset % ÷ 3412 × $/MMBTU
 - **Payback** = Net Cost ÷ Annual Savings
 """)
+
