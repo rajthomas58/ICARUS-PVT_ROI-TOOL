@@ -38,7 +38,7 @@ water_temp_in = st.sidebar.number_input("Water In Temperature (°F)", value=60.0
 water_temp_out = st.sidebar.number_input("Water Out Temperature (°F)", value=120.0)
 
 electricity_rate = st.sidebar.number_input("Electricity Rate ($/kWh)", value=0.15)
-grid_emission_factor = st.sidebar.number_input("Grid CO₂ Emission Factor (kg/kWh)", value=0.4)
+grid_emission_factor = st.sidebar.number_input("Grid CO2 Emission Factor (kg/kWh)", value=0.4)
 
 st.sidebar.header("Optional: Natural Gas Replacement")
 include_gas_savings = st.sidebar.checkbox("Include Natural Gas Replacement Savings?")
@@ -52,15 +52,14 @@ if st.sidebar.button("Calculate ROI"):
     pv_output_kwh = system_size_kw * annual_irradiance_kwh_m2 * (1 + pv_boost_pct / 100)
     thermal_output_kwh = pv_output_kwh * (thermal_efficiency / 100)
 
-    # Hot water calculation
     if water_temp_out > water_temp_in:
         hot_water_gallons = (thermal_output_kwh * 3412) / (8.34 * (water_temp_out - water_temp_in))
     else:
         hot_water_gallons = 0
 
-    # Cost and savings
     installation_cost = system_size_kw * 1000 * system_cost_per_w
     net_system_cost = installation_cost * (1 - incentive_pct / 100)
+
     electricity_savings = pv_output_kwh * electricity_rate
     gas_savings = 0
     if include_gas_savings:
@@ -70,7 +69,6 @@ if st.sidebar.button("Calculate ROI"):
     total_annual_savings = electricity_savings + gas_savings
     payback_period = net_system_cost / total_annual_savings if total_annual_savings else float("inf")
 
-    # CO₂ savings
     co2_savings_kg = pv_output_kwh * grid_emission_factor
     if include_gas_savings:
         gas_emission_factor = 53  # kg CO2 per MMBTU
@@ -87,19 +85,19 @@ if st.sidebar.button("Calculate ROI"):
         st.write(f"**Natural Gas Savings:** ${gas_savings:,.2f}")
     st.write(f"**Total Annual Savings:** ${total_annual_savings:,.2f}")
     st.write(f"**Payback Period:** {payback_period:.1f} years")
-    st.write(f"**CO₂ Savings:** {co2_savings_kg:,.0f} kg / {co2_savings_ton:.2f} tons")
+    st.write(f"**CO2 Savings:** {co2_savings_kg:,.0f} kg / {co2_savings_ton:.2f} tons")
 
     # Charts
     st.markdown("### Energy, Water & Carbon Breakdown")
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-    axes[0].bar(['PV (kWh)', 'Thermal (kWh)'], [pv_output_kwh, thermal_output_kwh])
+    axes[0].bar(['PV (kWh)', 'Thermal (kWh)'], [pv_output_kwh, thermal_output_kwh], color=['#1f77b4', '#ff7f0e'])
     axes[0].set_title("Energy Output")
     axes[0].set_ylabel("kWh")
-    axes[1].bar(['Hot Water'], [hot_water_gallons])
+    axes[1].bar(['Hot Water'], [hot_water_gallons], color=['#2ca02c'])
     axes[1].set_title("Hot Water")
     axes[1].set_ylabel("Gallons")
-    axes[2].bar(['CO₂ Saved'], [co2_savings_ton])
-    axes[2].set_title("CO₂ Savings")
+    axes[2].bar(['CO2 Saved'], [co2_savings_ton], color=['#d62728'])
+    axes[2].set_title("CO2 Savings")
     axes[2].set_ylabel("Metric Tons")
     st.pyplot(fig)
 
@@ -109,7 +107,7 @@ if st.sidebar.button("Calculate ROI"):
         'Value': [electricity_savings, gas_savings]
     })
     fig2, ax2 = plt.subplots(figsize=(8, 6))
-    ax2.bar(df2['Type'], df2['Value'])
+    ax2.bar(df2['Type'], df2['Value'], color=['#4daf4a', '#984ea3'])
     ax2.set_ylabel("Savings ($)")
     ax2.set_title("Annual Savings Breakdown")
     ax2.tick_params(axis='x', rotation=15)
@@ -120,9 +118,9 @@ if st.sidebar.button("Calculate ROI"):
     cumulative_cash_flow = np.cumsum([total_annual_savings] * 25) - net_system_cost
     fig3, ax3 = plt.subplots(figsize=(10, 6))
     ax3.plot(years, cumulative_cash_flow, marker='o')
-    ax3.axhline(0, linestyle='--')
+    ax3.axhline(0, color='gray', linestyle='--')
     if payback_period != float("inf"):
-        ax3.axvline(x=payback_period, linestyle=':', label=f"Payback: {payback_period:.1f} yrs")
+        ax3.axvline(x=payback_period, color='red', linestyle=':', label=f"Payback: {payback_period:.1f} yrs")
         ax3.legend()
     ax3.set_xlabel("Year")
     ax3.set_ylabel("Cumulative Cash Flow ($)")
@@ -136,39 +134,38 @@ if st.sidebar.button("Calculate ROI"):
         pdf = PDF()
         pdf.add_page()
         pdf.set_font("Arial", 'B', 16)
-        pdf.cell(0, 10, "ICARUS PV/T ROI Report", ln=True, align='C')
+        pdf.cell(200, 10, "ICARUS PV/T ROI Report", ln=True, align='C')
         pdf.set_font("Arial", '', 12)
         pdf.ln(5)
-        pdf.cell(0, 10, f"Location: {location}", ln=True)
-        pdf.cell(0, 10, f"System Size: {system_size_kw} kW", ln=True)
-        pdf.cell(0, 10, f"Annual PV Output: {pv_output_kwh:,.0f} kWh", ln=True)
-        pdf.cell(0, 10, f"Annual Thermal Output: {thermal_output_kwh:,.0f} kWh", ln=True)
-        pdf.cell(0, 10, f"Hot Water: {hot_water_gallons:,.0f} gallons", ln=True)
-        pdf.cell(0, 10, f"Electricity Savings: ${electricity_savings:,.2f}", ln=True)
+        pdf.cell(200, 10, f"Location: {location}", ln=True)
+        pdf.cell(200, 10, f"System Size: {system_size_kw} kW", ln=True)
+        pdf.cell(200, 10, f"Annual PV Output: {pv_output_kwh:,.0f} kWh", ln=True)
+        pdf.cell(200, 10, f"Annual Thermal Output: {thermal_output_kwh:,.0f} kWh", ln=True)
+        pdf.cell(200, 10, f"Hot Water: {hot_water_gallons:,.0f} gallons", ln=True)
+        pdf.cell(200, 10, f"Electricity Savings: ${electricity_savings:,.2f}", ln=True)
         if include_gas_savings:
-            pdf.cell(0, 10, f"Natural Gas Savings: ${gas_savings:,.2f}", ln=True)
-        pdf.cell(0, 10, f"Total Annual Savings: ${total_annual_savings:,.2f}", ln=True)
-        pdf.cell(0, 10, f"Payback Period: {payback_period:.1f} years", ln=True)
-        pdf.cell(0, 10, f"CO₂ Savings: {co2_savings_ton:.2f} metric tons", ln=True)
-        # Add chart images
+            pdf.cell(200, 10, f"Natural Gas Savings: ${gas_savings:,.2f}", ln=True)
+        pdf.cell(200, 10, f"Total Annual Savings: ${total_annual_savings:,.2f}", ln=True)
+        pdf.cell(200, 10, f"Payback Period: {payback_period:.1f} years", ln=True)
+        pdf.cell(200, 10, f"CO2 Savings: {co2_savings_ton:.2f} metric tons", ln=True)
+
         for fig in [fig2, fig3]:
             with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as img_temp:
                 fig.savefig(img_temp.name, bbox_inches='tight')
                 pdf.add_page()
                 pdf.image(img_temp.name, x=10, w=190)
-        # Write PDF to file
         pdf.output(tmpfile.name)
-    # Provide download button
+
     with open(tmpfile.name, "rb") as f:
-        pdf_bytes = f.read()
+        pdf_data = f.read()
     st.download_button(
         label="Download PDF Report",
-        data=pdf_bytes,
+        data=pdf_data,
         file_name="ICARUS_PVT_ROI_Report.pdf",
         mime="application/pdf"
     )
 
-# Sidebar Help and Info
+# Sidebar Help & Info
 st.sidebar.header("🧭 Help")
 with st.sidebar.expander("❓ FAQ"):
     st.markdown("""
@@ -178,7 +175,7 @@ A hybrid solar system that produces both electricity and heat.
 **What is thermal offset?**  
 The percentage of heating demand offset by the PV/T system.
 
-**Why does CO₂ savings matter?**  
+**Why does CO2 savings matter?**  
 Quantifies the environmental benefit of reduced fossil fuel use.
 """)
 
@@ -191,7 +188,7 @@ with st.sidebar.expander("📘 Glossary"):
 **System Cost ($/W):** Total cost of the system to the customer.  
 **Incentive (%):** Federal/State incentives available.  
 **Electricity Rate ($/kWh):** Price paid for grid electricity.  
-**Grid CO₂ Factor (kg/kWh):** CO₂ emissions per kWh from the grid.  
+**Grid CO2 Factor (kg/kWh):** CO2 emissions per kWh from the grid.  
 **Gas Rate ($/MMBTU):** Cost of natural gas.  
 **Thermal Offset (%):** How much heating demand is covered by PV/T.  
 **Water In/Out Temp:** Used to calculate hot water output.
@@ -205,7 +202,7 @@ with st.expander("📘 How It Works"):
 - **PV Output (kWh)** = System Size * Irradiance * (1 + PV Boost %)
 - **Thermal Output (kWh)** = PV Output * Thermal Efficiency
 - **Hot Water (gallons)** = Thermal Output * 3412 / (8.34 * ΔT)
-- **CO₂ Savings (kg)** = PV Output * Grid Emission Factor + (if enabled) Thermal Output * Gas Emission Factor
+- **CO2 Savings (kg)** = PV Output * Grid CO2 Factor + (if enabled) Thermal Output * Gas Emission Factor
 - **Gas Savings** = (Thermal Output * Offset %) / 3412 * Gas Rate ($/MMBTU)
 - **Payback Period** = Net System Cost / Total Annual Savings
-""" )
+""")
