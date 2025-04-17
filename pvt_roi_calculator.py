@@ -137,21 +137,28 @@ if st.sidebar.button("Calculate ROI"):
         pdf.cell(200, 10, "ICARUS PV/T ROI Report", ln=True, align='C')
         pdf.set_font("Arial", '', 12)
         pdf.ln(5)
-        pdf.cell(200, 10, f"Location: {location}", ln=True)
-        pdf.cell(200, 10, f"System Size: {system_size_kw} kW", ln=True)
-        pdf.cell(200, 10, f"Annual PV Output: {pv_output_kwh:,.0f} kWh", ln=True)
-        pdf.cell(200, 10, f"Annual Thermal Output: {thermal_output_kwh:,.0f} kWh", ln=True)
-        pdf.cell(200, 10, f"Hot Water: {hot_water_gallons:,.0f} gallons", ln=True)
-        pdf.cell(200, 10, f"Electricity Savings: ${electricity_savings:,.2f}", ln=True)
+        # Summary text
+        entries = [
+            f"Location: {location}",
+            f"System Size: {system_size_kw} kW",
+            f"Annual PV Output: {pv_output_kwh:,.0f} kWh",
+            f"Annual Thermal Output: {thermal_output_kwh:,.0f} kWh",
+            f"Hot Water: {hot_water_gallons:,.0f} gallons",
+            f"Electricity Savings: ${electricity_savings:,.2f}",
+        ]
         if include_gas_savings:
-            pdf.cell(200, 10, f"Natural Gas Savings: ${gas_savings:,.2f}", ln=True)
-        pdf.cell(200, 10, f"Total Annual Savings: ${total_annual_savings:,.2f}", ln=True)
-        pdf.cell(200, 10, f"Payback Period: {payback_period:.1f} years", ln=True)
-        pdf.cell(200, 10, f"CO2 Savings: {co2_savings_ton:.2f} metric tons", ln=True)
-
-        for fig in [fig2, fig3]:
+            entries.append(f"Natural Gas Savings: ${gas_savings:,.2f}")
+        entries += [
+            f"Total Annual Savings: ${total_annual_savings:,.2f}",
+            f"Payback Period: {payback_period:.1f} years",
+            f"CO2 Savings: {co2_savings_ton:.2f} metric tons",
+        ]
+        for line in entries:
+            pdf.cell(0, 10, line, ln=True)
+        # Add charts
+        for chart in [fig, fig2, fig3]:
             with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as img_temp:
-                fig.savefig(img_temp.name, bbox_inches='tight')
+                chart.savefig(img_temp.name, bbox_inches='tight')
                 pdf.add_page()
                 pdf.image(img_temp.name, x=10, w=190)
         pdf.output(tmpfile.name)
@@ -180,19 +187,24 @@ Quantifies the environmental benefit of reduced fossil fuel use.
 """)
 
 with st.sidebar.expander("📘 Glossary"):
-    st.markdown("""
-**System Size (kW):** Capacity of the photovoltaic system.  
-**Irradiance (kWh/m²/year):** Annual solar radiation received per square meter.  
-**PV Boost (%):** Additional electrical output from hybrid technology.  
-**Thermal Efficiency (%):** Portion of solar energy converted to heat.  
-**System Cost ($/W):** Total cost of the system to the customer.  
-**Incentive (%):** Federal/State incentives available.  
-**Electricity Rate ($/kWh):** Price paid for grid electricity.  
-**Grid CO2 Factor (kg/kWh):** CO2 emissions per kWh from the grid.  
-**Gas Rate ($/MMBTU):** Cost of natural gas.  
-**Thermal Offset (%):** How much heating demand is covered by PV/T.  
+    st.markdown(
+        """
+<div style='font-size:14px;'>
+**System Size (kW):** Capacity of the photovoltaic system.<br>
+**Irradiance (kWh/m²/year):** Annual solar radiation received per square meter.<br>
+**PV Boost (%):** Additional electrical output from hybrid technology.<br>
+**Thermal Efficiency (%):** Portion of solar energy converted to heat.<br>
+**System Cost ($/W):** Total cost of the system to the customer.<br>
+**Incentive (%):** Federal/State incentives available.<br>
+**Electricity Rate ($/kWh):** Price paid for grid electricity.<br>
+**Grid CO2 Factor (kg/kWh):** CO2 emissions per kWh from the grid.<br>
+**Gas Rate ($/MMBTU):** Cost of natural gas.<br>
+**Thermal Offset (%):** How much heating demand is covered by PV/T.<br>
 **Water In/Out Temp:** Used to calculate hot water output.
-""")
+</div>
+        """,
+        unsafe_allow_html=True
+    )
 
 with st.expander("📘 How It Works"):
     st.markdown("""
