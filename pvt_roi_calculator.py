@@ -166,7 +166,34 @@ if st.sidebar.button("Calculate ROI"):
 
 # Persistent Help Sections
 st.sidebar.header("🧭 Help")
-with st.sidebar.expander("❓ FAQ"):
+with with st.sidebar.expander("❓ FAQ"):
+    st.markdown("""
+**What is a PV/T system?**  
+A hybrid solar system that produces both electricity and heat.
+
+**What is thermal offset?**  
+The percentage of heating demand offset by the PV/T system.
+
+**Why does CO₂ savings matter?**  
+Quantifies the environmental benefit of reduced fossil fuel use.
+""")
+
+with st.sidebar.expander("📘 Glossary"):
+    st.markdown("""
+**System Size (kW):** Capacity of the photovoltaic system.  
+**Irradiance (kWh/m²/year):** Annual solar radiation received per square meter.  
+**PV Boost (%):** Additional electrical output from hybrid technology.  
+**Thermal Efficiency (%):** Portion of solar energy converted to heat.  
+**System Cost ($/W):** Installation cost per watt.  
+**Incentive (%):** Percent of cost offset by rebate or tax credit.  
+**Electricity Rate ($/kWh):** Price paid for grid electricity.  
+**Grid CO₂ Factor (kg/kWh):** CO₂ emissions per kWh from the grid.  
+**Gas Rate ($/MMBTU):** Cost of natural gas.  
+**Thermal Offset (%):** How much heating demand is covered by PV/T.  
+**Water In/Out Temp:** Used to calculate hot water output.
+""")
+
+with st.expander("📘 How It Works"):
     st.markdown("""
 ### 📘 How It Works
 
@@ -174,7 +201,8 @@ with st.sidebar.expander("❓ FAQ"):
 - **PV Output (kWh)** = System Size * Irradiance * (1 + PV Boost %)
 - **Thermal Output (kWh)** = PV Output * Thermal Efficiency
 - **Hot Water (gallons)** = Thermal Output * 3412 / (8.34 * ΔT)
-- **CO₂ Savings (kg)** = PV Output * Grid Emission Factor + (if enabled) Thermal MMBTU * Gas Emission Factor
-- **Gas Savings (MMBTU)** = Thermal Output * Offset % / 3412 * $/MMBTU
-- **Payback (years)** = Net Cost / Total Annual Savings
+- **CO₂ Savings (kg)** = PV Output * Grid Emission Factor + (if enabled) Thermal Output * Gas Emission Factor
+- **Gas Savings** = (Thermal Output * Offset %) / 3412 * Gas Rate ($/MMBTU)
+- **Payback Period** = Net System Cost / Total Annual Savings
 """)
+
