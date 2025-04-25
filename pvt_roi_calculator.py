@@ -38,7 +38,7 @@ water_temp_in = st.sidebar.number_input("Water In Temperature (°F)", value=60.0
 water_temp_out = st.sidebar.number_input("Water Out Temperature (°F)", value=120.0)
 
 electricity_rate = st.sidebar.number_input("Electricity Rate ($/kWh)", value=0.15)
-grid_emission_factor = st.sidebar.number_input("Grid CO2 Emission Factor (kg/kWh)", value=0.4)
+grid_emission_factor = st.sidebar.number_input("Grid CO2 Emission Factor (kg/kWh)", value=0.672)
 
 st.sidebar.header("Optional: Natural Gas Replacement")
 include_gas_savings = st.sidebar.checkbox("Include Natural Gas Replacement Savings?")
