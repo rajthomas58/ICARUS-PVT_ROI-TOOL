@@ -18,18 +18,19 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Puppeteer with Chromium
+      - name: Install Puppeteer and Chromium
         run: |
           npm init -y
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false npm install puppeteer
+          export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+          npm install puppeteer
 
       - name: Ping Streamlit App
         run: |
           echo "const puppeteer = require('puppeteer');" > ping.js
-          echo "puppeteer.launch({ headless: true }).then(async browser => {" >> ping.js
+          echo "puppeteer.launch({ headless: 'new' }).then(async browser => {" >> ping.js
           echo "  const page = await browser.newPage();" >> ping.js
-          echo "  await page.goto('https://icarus-pvtroi-tool-ekraek9daw6zlbvtrc4hyh.streamlit.app/', {waitUntil: 'networkidle2'});" >> ping.js
-          echo "  console.log('✅ Streamlit app loaded');" >> ping.js
+          echo "  await page.goto('https://icarus-pvtroi-tool-ekraek9daw6zlbvtrc4hyh.streamlit.app/', { waitUntil: 'networkidle2', timeout: 60000 });" >> ping.js
+          echo "  console.log('✅ Streamlit app loaded successfully');" >> ping.js
           echo "  await browser.close();" >> ping.js
           echo "});" >> ping.js
           node ping.js
