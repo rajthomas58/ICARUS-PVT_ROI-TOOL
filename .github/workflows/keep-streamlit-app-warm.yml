@@ -2,7 +2,7 @@ name: Keep Streamlit App Warm
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Every 10 minutes
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,27 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Install Puppeteer and Chromium
+      - name: Create script and install Puppeteer
         run: |
           npm init -y
-          export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
           npm install puppeteer
 
-      - name: Ping Streamlit App
-        run: |
           echo "const puppeteer = require('puppeteer');" > ping.js
-          echo "puppeteer.launch({ headless: 'new' }).then(async browser => {" >> ping.js
-          echo "  const page = await browser.newPage();" >> ping.js
-          echo "  await page.goto('https://icarus-pvtroi-tool-ekraek9daw6zlbvtrc4hyh.streamlit.app/', { waitUntil: 'networkidle2', timeout: 60000 });" >> ping.js
-          echo "  console.log('✅ Streamlit app loaded successfully');" >> ping.js
-          echo "  await browser.close();" >> ping.js
-          echo "});" >> ping.js
-          node ping.js
+          echo "(async () => {" >> ping.js
+          echo "  try {" >> ping.js
+          echo "    const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox'] });" >> ping.js
+          echo "    const page = await browser.newPage();" >> ping.js
+          echo "    await page.goto('https://icarus-pvtroi-tool-ekraek9daw6zlbvtrc4hyh.streamlit.app/', { waitUntil: 'networkidle2', timeout: 60000 });" >> ping.js
+          echo "    console.log('✅ Streamlit app warmed');" >> ping.js
+          echo "    await browser.close();" >> ping.js
+          echo "  } catch (err) {" >> ping.js
+          echo "    console.error('❌ Failed to load Streamlit app:', err);" >> ping.js
+          echo "    process.exit(1);" >> ping.js
+          echo "  }" >> ping.js
+          echo "})();" >> ping.js
+
+      - name: Run warm-up script
+        run: node ping.js
